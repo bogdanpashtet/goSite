@@ -4,6 +4,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/jackc/pgx"
+	"internal/models"
+	"log"
+	"net/http"
 	"os"
 )
 
@@ -15,22 +18,58 @@ const (
 	database = "go_site"
 )
 
-var Conn *pgx.Conn
-
-func CloseConnection(link *pgx.Conn) {
+func closeConnection(link *pgx.Conn) {
 	err := link.Close(context.Background())
 	if err != nil {
 		fmt.Println("Connection closed.")
 	}
 }
 
-func Connection() {
+func connection() *pgx.Conn {
 	connectionUrl := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s", username, password, host, port, database)
-	Conn, err := pgx.Connect(context.Background(), connectionUrl)
+	conn, err := pgx.Connect(context.Background(), connectionUrl)
 	if err != nil {
 		fmt.Printf("Unable to connect to database: %v\n", err)
-		os.Exit(1) // error output
+		return nil
 	} else {
-		fmt.Printf("Connected to database!\nConnection: %v", Conn)
+		fmt.Printf("Connected to database!\n")
+		return conn
 	}
+}
+
+func AddToDataBase(resp http.ResponseWriter, req *http.Request) {
+	Name := req.FormValue("Name")
+	Price := req.FormValue("Price")
+
+	conn := connection()
+	defer closeConnection(conn)
+
+	err := conn.QueryRow(context.Background(), "INSERT INTO products (name, price) VALUES ($1, $2);", Name, Price).Scan(&Name, &Price)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "QueryRow failed: %v\n", err)
+	}
+
+	http.Redirect(resp, req, "/", 301)
+}
+
+func SelectProducts(resp http.ResponseWriter, req *http.Request) []models.Product {
+	conn := connection()
+	defer closeConnection(conn)
+
+	rows, err := conn.Query(context.Background(), "select * from products;")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "QueryRow failed: %v\n", err)
+	}
+
+	var rowSlice []models.Product
+	for rows.Next() {
+		var r models.Product
+		err := rows.Scan(&r.Id, &r.Name, &r.Price)
+		if err != nil {
+			log.Fatal(err)
+		}
+		rowSlice = append(rowSlice, r)
+	}
+
+	return rowSlice
 }
