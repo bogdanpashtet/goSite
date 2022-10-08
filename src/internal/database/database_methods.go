@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"fmt"
+	"github.com/gorilla/mux"
 	"github.com/jackc/pgx"
 	"internal/models"
 	"log"
@@ -72,4 +73,18 @@ func SelectProducts(resp http.ResponseWriter, req *http.Request) []models.Produc
 	}
 
 	return rowSlice
+}
+
+func GetProduct(resp http.ResponseWriter, req *http.Request) models.Product {
+	vars := mux.Vars(req)
+	id := vars["id"]
+
+	var r models.Product
+
+	conn := connection()
+	defer closeConnection(conn)
+
+	conn.QueryRow(context.Background(), "select * from products where product_id=$1;", id).Scan(&r.Id, &r.Name, &r.Price)
+
+	return r
 }

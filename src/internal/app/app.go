@@ -1,7 +1,6 @@
 package app
 
 import (
-	"fmt"
 	"github.com/gorilla/mux"
 	"html/template"
 	"internal/database"
@@ -10,11 +9,11 @@ import (
 )
 
 func mainPage(resp http.ResponseWriter, req *http.Request) {
-	Title := "Главная страница"
+	Title := "Main page"
 	List := database.SelectProducts(resp, req)
 
-	tmpl, _ := template.ParseFiles("src/web/static/index.html",
-		"src/web/static/header.html", "src/web/static/footer.html")
+	tmpl, _ := template.ParseFiles("src/templates/index.html",
+		"src/templates/header.html", "src/templates/footer.html")
 	tmpl.ExecuteTemplate(resp, "index", struct {
 		Title string
 		List  []models.Product
@@ -22,28 +21,35 @@ func mainPage(resp http.ResponseWriter, req *http.Request) {
 }
 
 func addProduct(resp http.ResponseWriter, req *http.Request) {
-	Title := "Добавить товар"
+	Title := "Add product"
 
-	tmpl, _ := template.ParseFiles("src/web/static/add_product.html",
-		"src/web/static/header.html", "src/web/static/footer.html")
+	tmpl, _ := template.ParseFiles("src/templates/add_product.html",
+		"src/templates/header.html", "src/templates/footer.html")
 	tmpl.ExecuteTemplate(resp, "add_product", struct{ Title string }{Title: Title})
 }
 
 func productsHandler(resp http.ResponseWriter, req *http.Request) {
-	vars := mux.Vars(req)
-	id := vars["id"]
-	response := fmt.Sprintf("Product %s", id)
-	fmt.Fprint(resp, response)
+	Title := "Product page"
+	Row := database.GetProduct(resp, req)
+
+	tmpl, _ := template.ParseFiles("src/templates/product.html",
+		"src/templates/header.html", "src/templates/footer.html")
+
+	tmpl.ExecuteTemplate(resp, "product", struct {
+		Title string
+		Row   models.Product
+	}{Title: Title, Row: Row})
+
 }
 
 func Run() {
+
 	//	gorilla/mux routing
 	router := mux.NewRouter()
 	router.HandleFunc("/", mainPage)
 	router.HandleFunc("/add", addProduct)
 	router.HandleFunc("/save_product", database.AddToDataBase)
 	router.HandleFunc("/product/{id:[0-9]+}", productsHandler)
-	http.Handle("/", router)
 
-	http.ListenAndServe(":8181", nil)
+	http.ListenAndServe(":8181", router)
 }

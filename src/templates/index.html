@@ -1,0 +1,17 @@
+{{ define "index" }}
+{{ template "header" }}
+<title>{{ .Title }}</title>
+<body>
+        <div class="conteiner m-5">
+        {{ range .List }}
+            <div class="card m-3" style="width: 18rem;">
+                <div class="card-body">
+                    <h5 class="card-title">{{ .Name }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">Price: {{ .Price }}</h6>
+                    <a href="product/{{ .Id }}" class="card-link">Link to this product</a>
+                </div>
+            </div>
+        {{ end }}
+        </div>
+{{ template "footer" }}
+{{ end }}

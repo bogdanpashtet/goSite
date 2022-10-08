@@ -1,0 +1,15 @@
+{{ define "product" }}
+    {{ template "header" }}
+    <title>{{ .Title }}</title>
+    <body>
+    <div class="conteiner m-5">
+        <div class="card m-3" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">{{ .Row.Name }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">Price: {{ .Row.Price }}</h6>
+                <h6 class="card-subtitle mb-2 text-muted">Id of this product: {{ .Row.Id }}</h6>
+            </div>
+        </div>
+    </div>
+    {{ template "footer" }}
+{{ end }}
