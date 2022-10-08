@@ -4,17 +4,17 @@
 </head>
 <body>
   <main>
-  <h2 class="text-center">Ввод данных</h2>
+  <h2 class="text-center">Input data about product</h2>
   <form method="POST" action="/save_product" class="text-center">
     <div class="form-group">
-    <label>Название товара</label><br>
+    <label>Name of the product:</label><br>
     <input type="text" name="Name" /><br><br>
     </div>
     <div class="form-group">
-    <label>Цена товара</label><br>
+    <label>Price of the product:</label><br>
     <input type="number" name="Price" /><br><br>
     </div>
-    <input class="btn btn-primary" type="submit" value="Отправить" />
+    <input class="btn btn-primary" type="submit" value="Submit" />
   </form>
   </main>
 {{ template "footer" }}

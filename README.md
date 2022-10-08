@@ -6,3 +6,4 @@ In this site you can add product and get a bit of information about it.
 <li>Golang 1.18
 <li>PostgreSQL 14.5
 <li>HTML 5
+<li>Bootstrap 5.2.2
